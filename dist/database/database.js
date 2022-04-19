@@ -58,27 +58,18 @@ function getLastInfo(id) {
 exports.getLastInfo = getLastInfo;
 function insertFullData(json) {
     return __awaiter(this, void 0, void 0, function* () {
-        let counter = 0;
-        if (counter === 60) {
-            try {
-                yield client.connect();
-                const database = client.db('sensors');
-                const collection = database.collection('brokerData');
-                return yield collection.insertOne(json);
-            }
-            catch (err) {
-                console.log(err);
-                return undefined;
-            }
-            finally {
-                counter = 0;
-                yield client.close();
-            }
+        try {
+            yield client.connect();
+            const database = client.db('sensors');
+            const collection = database.collection('brokerData');
+            return yield collection.insertOne(json);
         }
-        else {
-            counter++;
-            console.log('data not inserted yet, counter at: ', counter);
-            return counter;
+        catch (err) {
+            console.log(err);
+            return undefined;
+        }
+        finally {
+            yield client.close();
         }
     });
 }

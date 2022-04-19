@@ -40,23 +40,15 @@ export async function getLastInfo(id: string): Promise<any> {
 }
 
 export async function insertFullData(json: any) {
-  let counter = 0;
-  if (counter === 60) {
-    try {
-      await client.connect();
-      const database = client.db('sensors');
-      const collection = database.collection('brokerData');
-      return await collection.insertOne(json);
-    } catch (err) {
-      console.log(err);
-      return undefined;
-    } finally {
-      counter = 0;
-      await client.close();
-    }
-  } else {
-    counter++;
-    console.log('data not inserted yet, counter at: ', counter);
-    return counter;
+  try {
+    await client.connect();
+    const database = client.db('sensors');
+    const collection = database.collection('brokerData');
+    return await collection.insertOne(json);
+  } catch (err) {
+    console.log(err);
+    return undefined;
+  } finally {
+    await client.close();
   }
 }
