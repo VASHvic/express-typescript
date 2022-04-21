@@ -51,3 +51,4 @@ export async function insertFullData(json: any): Promise<any> {
     await client.close();
   }
 }
+
