@@ -16,30 +16,32 @@ exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const database_1 = require("./database/database");
-const app = (0, express_1.default)();
+const app = express_1.default();
 exports.app = app;
 app.use(express_1.default.json());
-app.use((0, cors_1.default)());
-app.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const documents = yield (0, database_1.getAll)();
+app.use(cors_1.default());
+app.get('/', (_, res) => {
+    res.json({ routes: { get: ['/', '/getall', 'get/:id'], post: ['/'] } });
+});
+app.get('/getall', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const documents = yield database_1.getAll();
     res.send(documents);
 }));
-app.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const last = yield (0, database_1.getLastInfo)(id);
-    console.log('👻', last);
+app.get('/get/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const sensorId = req.params.id;
+    const last = yield database_1.getLastInfo(sensorId);
     res.send(last);
 }));
 app.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const info = req.body;
-    const sensorId = req.body.body.subscriptionId;
-    info.insertDate = new Date();
-    info.sensorId = sensorId;
     try {
-        const insert = yield (0, database_1.insertFullData)(info);
+        const insert = yield database_1.insertFullData(req.body);
         res.send(insert);
     }
     catch (err) {
-        console.log(err);
+        res.json({
+            error: {
+                message: err.message,
+            },
+        });
     }
 }));

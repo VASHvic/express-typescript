@@ -8,33 +8,27 @@ export async function getAll(): Promise<any[] | string> {
     await client.connect();
     const database = client.db('sensors');
     const collection = database.collection('brokerData');
-    return await collection.find({}).sort({insertDate: -1}).toArray();
+    return await collection.find({}).sort({$natural: -1}).toArray();
   } catch (err) {
-    console.log(err);
-    return err.message;
-  } finally {
-    await client.close();
+    return err;
   }
 }
-export async function getLastInfo(id: string): Promise<any> {
-  const query = {sensorId: id};
-  console.log(query);
+export async function getLastInfo(sensorId: string): Promise<any> {
+  const query = {
+    'body.data': {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
+  };
   const options: any = {
-    sort: {insertDate: -1},
-    projection: {_id: 1, insertDate: 1, sensorId: 1, value: 1},
+    sort: {$natural: -1},
+    projection: {body: 1},
   };
 
   try {
     await client.connect();
     const database = client.db('sensors');
     const collection = database.collection('brokerData');
-    const lastInfo = await collection.findOne(query, options);
-    return lastInfo;
+    return await collection.findOne(query, options);
   } catch (err) {
-    console.log(err);
-    return err.message;
-  } finally {
-    await client.close();
+    return err;
   }
 }
 
@@ -45,10 +39,6 @@ export async function insertFullData(json: any): Promise<any> {
     const collection = database.collection('brokerData');
     return await collection.insertOne(json);
   } catch (err) {
-    console.log(err);
-    return err.message;
-  } finally {
-    await client.close();
+    return err;
   }
 }
-

@@ -1,12 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import {getAll, insertFullData, getLastInfo} from './database/database';
+
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 app.get('/', (_, res) => {
-  res.send('Routes available:\n/getAll\n/get/:id\nPOST: /');
+  res.json({routes: {get: ['/', '/getall', 'get/:id'], post: ['/']}});
 });
 
 app.get('/getall', async (_, res) => {
@@ -15,8 +16,8 @@ app.get('/getall', async (_, res) => {
 });
 
 app.get('/get/:id', async (req, res) => {
-  const id = req.params.id;
-  const last = await getLastInfo(id);
+  const sensorId = req.params.id;
+  const last = await getLastInfo(sensorId);
   res.send(last);
 });
 
@@ -25,8 +26,11 @@ app.post('/', async (req, res) => {
     const insert = await insertFullData(req.body);
     res.send(insert);
   } catch (err) {
-    console.log(err);
-    res.json(err);
+    res.json({
+      error: {
+        message: err.message,
+      },
+    });
   }
 });
 

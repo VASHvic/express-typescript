@@ -19,39 +19,31 @@ function getAll() {
             yield client.connect();
             const database = client.db('sensors');
             const collection = database.collection('brokerData');
-            return yield collection.find({}).limit(10).sort({ insertDate: -1 }).toArray();
+            return yield collection.find({}).sort({ $natural: -1 }).toArray();
         }
         catch (err) {
-            console.log(err);
-            return undefined;
-        }
-        finally {
-            yield client.close();
+            return err;
         }
     });
 }
 exports.getAll = getAll;
-function getLastInfo(id) {
+function getLastInfo(sensorId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = { sensorId: id };
-        console.log(query);
+        const query = {
+            'body.data': { $elemMatch: { id: `NoiseLevelObserved-HOPVLCi${sensorId}` } },
+        };
         const options = {
-            sort: { insertDate: -1 },
-            projection: { _id: 1, insertDate: 1, sensorId: 1, value: 1 },
+            sort: { $natural: -1 },
+            projection: { body: 1 },
         };
         try {
             yield client.connect();
             const database = client.db('sensors');
             const collection = database.collection('brokerData');
-            const lastInfo = yield collection.findOne(query, options);
-            return lastInfo;
+            return yield collection.findOne(query, options);
         }
         catch (err) {
-            console.log(err);
-            return undefined;
-        }
-        finally {
-            yield client.close();
+            return err;
         }
     });
 }
@@ -65,11 +57,7 @@ function insertFullData(json) {
             return yield collection.insertOne(json);
         }
         catch (err) {
-            console.log(err);
-            return undefined;
-        }
-        finally {
-            yield client.close();
+            return err;
         }
     });
 }
