@@ -27,13 +27,23 @@ app.get('/getall', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const documents = yield (0, database_1.getAll)();
     res.send(documents);
 }));
+app.get('/getall/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const sensorId = req.params.id;
+    const last = yield (0, database_1.getAllInfoFromId)(sensorId);
+    res.send(last);
+}));
 app.get('/get/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sensorId = req.params.id;
-    const last = yield (0, database_1.getLastInfo)(sensorId);
-    res.send(last);
+    const info = yield (0, database_1.getLastInfo)(sensorId);
+    res.send(info);
 }));
 app.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const [data] = req.body.data;
+        console.log(data.id);
+        if (data.id) {
+            req.body.myId = data.id;
+        }
         const insert = yield (0, database_1.insertFullData)(req.body);
         res.send(insert);
     }

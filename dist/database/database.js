@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertFullData = exports.getLastInfo = exports.getAll = void 0;
+exports.insertFullData = exports.getAllInfoFromId = exports.getLastInfo = exports.getAll = void 0;
 const mongodb_1 = require("mongodb");
 const config_1 = require("../config");
 const client = new mongodb_1.MongoClient(config_1.MONGODB_URI);
@@ -34,7 +34,7 @@ function getLastInfo(sensorId) {
         };
         const options = {
             sort: { $natural: -1 },
-            projection: { body: 1 },
+            // projection: {body: 1},
         };
         try {
             yield client.connect();
@@ -48,6 +48,23 @@ function getLastInfo(sensorId) {
     });
 }
 exports.getLastInfo = getLastInfo;
+function getAllInfoFromId(sensorId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = {
+            data: { $elemMatch: { id: `NoiseLevelObserved-HOPVLCi${sensorId}` } },
+        };
+        try {
+            yield client.connect();
+            const database = client.db('sensors');
+            const collection = database.collection('brokerData');
+            return yield collection.find(query).toArray();
+        }
+        catch (err) {
+            return err;
+        }
+    });
+}
+exports.getAllInfoFromId = getAllInfoFromId;
 function insertFullData(json) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

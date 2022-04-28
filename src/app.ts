@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import {getAll, insertFullData, getLastInfo} from './database/database';
+import {getAll, insertFullData, getLastInfo, getAllInfoFromId} from './database/database';
 
 const app = express();
 app.use(express.json());
@@ -14,15 +14,26 @@ app.get('/getall', async (_, res) => {
   const documents = await getAll();
   res.send(documents);
 });
+app.get('/getall/:id', async (req, res) => {
+  const sensorId = req.params.id;
+  const last = await getAllInfoFromId(sensorId);
+  res.send(last);
+});
 
 app.get('/get/:id', async (req, res) => {
   const sensorId = req.params.id;
-  const last = await getLastInfo(sensorId);
-  res.send(last);
+  const info = await getLastInfo(sensorId);
+  res.send(info);
 });
 
 app.post('/', async (req, res) => {
   try {
+    const [data] = req.body.data;
+    console.log(data.id);
+
+    if (data.id) {
+      req.body.myId = data.id;
+    }
     const insert = await insertFullData(req.body);
     res.send(insert);
   } catch (err) {
