@@ -30,7 +30,7 @@ exports.getAll = getAll;
 function getLastInfo(sensorId) {
     return __awaiter(this, void 0, void 0, function* () {
         const query = {
-            'body.data': { $elemMatch: { id: `NoiseLevelObserved-HOPVLCi${sensorId}` } },
+            data: { $elemMatch: { id: `NoiseLevelObserved-HOPVLCi${sensorId}` } },
         };
         const options = {
             sort: { $natural: -1 },

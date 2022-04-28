@@ -15,7 +15,7 @@ export async function getAll(): Promise<any[] | string> {
 }
 export async function getLastInfo(sensorId: string): Promise<any> {
   const query = {
-    'body.data': {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
+    data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
   };
   const options: any = {
     sort: {$natural: -1},

@@ -16,25 +16,25 @@ exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const database_1 = require("./database/database");
-const app = express_1.default();
+const app = (0, express_1.default)();
 exports.app = app;
 app.use(express_1.default.json());
-app.use(cors_1.default());
+app.use((0, cors_1.default)());
 app.get('/', (_, res) => {
     res.json({ routes: { get: ['/', '/getall', 'get/:id'], post: ['/'] } });
 });
 app.get('/getall', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const documents = yield database_1.getAll();
+    const documents = yield (0, database_1.getAll)();
     res.send(documents);
 }));
 app.get('/get/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sensorId = req.params.id;
-    const last = yield database_1.getLastInfo(sensorId);
+    const last = yield (0, database_1.getLastInfo)(sensorId);
     res.send(last);
 }));
 app.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const insert = yield database_1.insertFullData(req.body);
+        const insert = yield (0, database_1.insertFullData)(req.body);
         res.send(insert);
     }
     catch (err) {
