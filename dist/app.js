@@ -27,6 +27,10 @@ app.get('/getall', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const documents = yield (0, database_1.getAll)();
     res.send(documents);
 }));
+app.get('/getall/last', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const documents = yield (0, database_1.getAllLast)();
+    res.send(documents);
+}));
 app.get('/getall/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const sensorId = req.params.id;
     const last = yield (0, database_1.getAllInfoFromId)(sensorId);

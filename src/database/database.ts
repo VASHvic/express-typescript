@@ -2,7 +2,7 @@ import {MongoClient} from 'mongodb';
 import {MONGODB_URI} from '../config';
 
 const client = new MongoClient(MONGODB_URI);
-
+//TODO: Convertir en clase?
 export async function getAll(): Promise<any[] | Error> {
   try {
     await client.connect();
@@ -48,7 +48,6 @@ export async function getLastInfo(sensorId: string): Promise<any> {
   };
   const options: any = {
     sort: {$natural: -1},
-    // projection: {body: 1},
   };
 
   try {
@@ -60,6 +59,7 @@ export async function getLastInfo(sensorId: string): Promise<any> {
     return err;
   }
 }
+//TODO: afegir projecció als datos que fan falta per al array de la gráfica
 export async function getAllInfoFromId(sensorId: string): Promise<any> {
   const query = {
     data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},

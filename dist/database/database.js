@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertFullData = exports.getAllInfoFromId = exports.getLastInfo = exports.getAll = void 0;
+exports.insertFullData = exports.getAllInfoFromId = exports.getLastInfo = exports.getAllLast = exports.getAll = void 0;
 const mongodb_1 = require("mongodb");
 const config_1 = require("../config");
 const client = new mongodb_1.MongoClient(config_1.MONGODB_URI);
+//TODO: Convertir en clase?
 function getAll() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -27,6 +28,39 @@ function getAll() {
     });
 }
 exports.getAll = getAll;
+function getAllLast() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield client.connect();
+            const database = client.db('sensors');
+            const collection = database.collection('brokerData');
+            return yield collection
+                .aggregate([
+                {
+                    $unwind: {
+                        path: '$data',
+                    },
+                },
+                {
+                    $sort: {
+                        'data.LAeq.metadata.TimeInstant.value': -1,
+                    },
+                },
+                {
+                    $group: {
+                        _id: '$data.id',
+                        doc: { $first: '$$ROOT' },
+                    },
+                },
+            ])
+                .toArray();
+        }
+        catch (err) {
+            return err;
+        }
+    });
+}
+exports.getAllLast = getAllLast;
 function getLastInfo(sensorId) {
     return __awaiter(this, void 0, void 0, function* () {
         const query = {
@@ -34,7 +68,6 @@ function getLastInfo(sensorId) {
         };
         const options = {
             sort: { $natural: -1 },
-            // projection: {body: 1},
         };
         try {
             yield client.connect();
@@ -48,6 +81,7 @@ function getLastInfo(sensorId) {
     });
 }
 exports.getLastInfo = getLastInfo;
+//TODO: afegir projecció als datos que fan falta per al array de la gráfica
 function getAllInfoFromId(sensorId) {
     return __awaiter(this, void 0, void 0, function* () {
         const query = {
