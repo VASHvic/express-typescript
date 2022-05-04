@@ -3,12 +3,41 @@ import {MONGODB_URI} from '../config';
 
 const client = new MongoClient(MONGODB_URI);
 
-export async function getAll(): Promise<any[] | string> {
+export async function getAll(): Promise<any[] | Error> {
   try {
     await client.connect();
     const database = client.db('sensors');
     const collection = database.collection('brokerData');
     return await collection.find({}).sort({$natural: -1}).toArray();
+  } catch (err) {
+    return err;
+  }
+}
+export async function getAllLast(): Promise<any[] | Error> {
+  try {
+    await client.connect();
+    const database = client.db('sensors');
+    const collection = database.collection('brokerData');
+    return await collection
+      .aggregate([
+        {
+          $unwind: {
+            path: '$data',
+          },
+        },
+        {
+          $sort: {
+            'data.LAeq.metadata.TimeInstant.value': -1,
+          },
+        },
+        {
+          $group: {
+            _id: '$data.id',
+            doc: {$first: '$$ROOT'},
+          },
+        },
+      ])
+      .toArray();
   } catch (err) {
     return err;
   }

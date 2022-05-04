@@ -18,6 +18,4 @@ ensor 17 - Carrer Polo y Peyrolon 43",
 Sensor 18 - Carrer Polo y Peyrolon 38",
 ensor 19 - Carrer Polo y Peyrolon 53",
 Sensor 20 - Carrer Comte d Altea 20",
-21---------------------------------
 Sensor 22 - Carrer Almirall Cadarso 30",
-23---------------------------
