@@ -1,10 +1,10 @@
 import express, {Request, Response} from 'express';
 import cors from 'cors';
 import {MongoService} from './database/database';
-const app = express();
-app.use(express.json());
 
-//TODO: llevar cors?
+const app = express();
+
+app.use(express.json());
 app.use(cors());
 
 const mongo = new MongoService();
@@ -15,24 +15,44 @@ app.get('/', (_, res: Response): Object => {
   });
 });
 
-app.get('/getall', async (_, res: Response) => {
-  const collection = await mongo.connect();
-  const documents = await mongo.getAll(collection);
-  return res.send(documents);
+app.get('/getall', async (_, res: Response): Promise<any[] | Object> => {
+  try {
+    const collection = await mongo.connect();
+    const documents = await mongo.getAll(collection);
+    return res.send(documents);
+  } catch (err) {
+    return res.status(500).json({error: err.message});
+  }
 });
 
 app.get('/getall/last', async (_, res: Response): Promise<any[] | Object> => {
-  const collection = await mongo.connect();
-  const documents = await mongo.getAllLast(collection);
-  return res.send(documents);
+  try {
+    const collection = await mongo.connect();
+    const documents = await mongo.getAllLast(collection);
+    return res.send(documents);
+  } catch (err) {
+    return res.status(500).json({error: err.message});
+  }
 });
 
-app.post('/', async (req: Request, res: Response) => {
-  const collection = await mongo.connect();
-  const insert = await mongo.insertFullData(collection, req.body);
-  return res.send(insert);
+app.post(
+  '/',
+  async (req: Request, res: Response): Promise<Response<boolean | Object>> => {
+    try {
+      const collection = await mongo.connect();
+      const insert = await mongo.insertFullData(collection, req.body);
+      return res.send(insert);
+    } catch (err) {
+      return res.status(500).json({error: err.message});
+    }
+  }
+);
+
+app.get('*', (_, res: Response): Response<String> => {
+  return res.status(301).send('Route not Found');
 });
 
+export {app};
 // app.get('/getall/:id', async (req: Request, res: Response) => {
 //   const sensorId = req.params?.id;
 //   const last = await getAllInfoFromId(sensorId);
@@ -62,5 +82,3 @@ app.post('/', async (req: Request, res: Response) => {
 //     });
 //   }
 // });
-
-export {app};

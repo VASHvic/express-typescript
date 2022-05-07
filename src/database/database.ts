@@ -14,75 +14,47 @@ export class MongoService {
   }
 
   async getAll(collection: Collection) {
-    return await collection.find({}).sort({$natural: -1}).toArray();
+    try {
+      return await collection.find({}).sort({$natural: -1}).toArray();
+    } catch (err) {
+      return err;
+    }
   }
   async getAllLast(collection: Collection) {
-    return await collection
-      .aggregate([
-        {
-          $unwind: {
-            path: '$data',
+    try {
+      return await collection
+        .aggregate([
+          {
+            $unwind: {
+              path: '$data',
+            },
           },
-        },
-        {
-          $sort: {
-            'data.LAeq.metadata.TimeInstant.value': -1,
+          {
+            $sort: {
+              'data.LAeq.metadata.TimeInstant.value': -1,
+            },
           },
-        },
-        {
-          $group: {
-            _id: '$data.id',
-            doc: {$first: '$$ROOT'},
+          {
+            $group: {
+              _id: '$data.id',
+              doc: {$first: '$$ROOT'},
+            },
           },
-        },
-      ])
-      .toArray();
+        ])
+        .toArray();
+    } catch (err) {
+      return err;
+    }
   }
   async insertFullData(collection: Collection, json: any): Promise<boolean> {
-    const {acknowledged} = await collection.insertOne(json);
-    return acknowledged;
+    try {
+      const {acknowledged} = await collection.insertOne(json);
+      return acknowledged;
+    } catch (err) {
+      return err;
+    }
   }
 }
-
-// export async function getAll(): Promise<any[] | Error> {
-//   try {
-//     await client.connect();
-//     const database = client.db('sensors');
-//     const collection = database.collection('brokerData');
-//     return await collection.find({}).sort({$natural: -1}).toArray();
-//   } catch (err) {
-//     return err;
-//   }
-// }
-// export async function getAllLast(): Promise<any[] | Error> {
-//   try {
-//     await client.connect();
-//     const database = client.db('sensors');
-//     const collection = database.collection('brokerData');
-//     return await collection
-//       .aggregate([
-//         {
-//           $unwind: {
-//             path: '$data',
-//           },
-//         },
-//         {
-//           $sort: {
-//             'data.LAeq.metadata.TimeInstant.value': -1,
-//           },
-//         },
-//         {
-//           $group: {
-//             _id: '$data.id',
-//             doc: {$first: '$$ROOT'},
-//           },
-//         },
-//       ])
-//       .toArray();
-//   } catch (err) {
-//     return err;
-//   }
-// }
 // export async function getLastInfo(sensorId: string): Promise<any> {
 //   const query = {
 //     data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
