@@ -2,7 +2,7 @@ import {Collection, MongoClient} from 'mongodb';
 import {MONGODB_URI} from '../config';
 
 export class MongoService {
-  client = new MongoClient(MONGODB_URI);
+  client = new MongoClient(MONGODB_URI || '');
 
   async connect() {
     try {
@@ -46,56 +46,33 @@ export class MongoService {
       return err;
     }
   }
-  async insertFullData(collection: Collection, json: any): Promise<boolean> {
+  async insertFullData(collection: Collection, json: any): Promise<boolean | unknown> {
     try {
       const {acknowledged} = await collection.insertOne(json);
       return acknowledged;
+    } catch (err: unknown) {
+      return err;
+    }
+  }
+  async getAllInfoFromId(
+    collection: Collection,
+    sensorId: string
+  ): Promise<any[] | unknown> {
+    const query = {
+      data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
+    };
+    try {
+      return await collection.find(query).toArray();
+    } catch (err: unknown) {
+      return err;
+    }
+  }
+
+  async getAllSensorIds(collection: Collection): Promise<String[] | unknown> {
+    try {
+      return await collection.distinct('data.id');
     } catch (err) {
       return err;
     }
   }
 }
-// export async function getLastInfo(sensorId: string): Promise<any> {
-//   const query = {
-//     data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
-//   };
-//   const options: any = {
-//     sort: {$natural: -1},
-//   };
-
-//   try {
-//     await client.connect();
-//     const database = client.db('sensors');
-//     const collection = database.collection('brokerData');
-//     return await collection.findOne(query, options);
-//   } catch (err) {
-//     return err;
-//   }
-// }
-// //TODO: afegir projecció als datos que fan falta per al array de la gráfica
-// export async function getAllInfoFromId(sensorId: string): Promise<any> {
-//   const query = {
-//     data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
-//   };
-
-//   try {
-//     await client.connect();
-//     const database = client.db('sensors');
-//     const collection = database.collection('brokerData');
-//     return await collection.find(query).toArray();
-//   } catch (err) {
-//     return err;
-//   }
-// }
-
-// export async function insertFullData(json: any): Promise<boolean | Error> {
-//   try {
-//     await client.connect();
-//     const database = client.db('sensors');
-//     const collection = database.collection('brokerData');
-//     const {acknowledged} = await collection.insertOne(json);
-//     return acknowledged;
-//   } catch (err) {
-//     return err;
-//   }
-// }
