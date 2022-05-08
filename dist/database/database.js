@@ -9,107 +9,96 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertFullData = exports.getAllInfoFromId = exports.getLastInfo = exports.getAllLast = exports.getAll = void 0;
+exports.MongoService = void 0;
 const mongodb_1 = require("mongodb");
 const config_1 = require("../config");
-const client = new mongodb_1.MongoClient(config_1.MONGODB_URI);
-//TODO: Convertir en clase?
-function getAll() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield client.connect();
-            const database = client.db('sensors');
-            const collection = database.collection('brokerData');
-            return yield collection.find({}).sort({ $natural: -1 }).toArray();
-        }
-        catch (err) {
-            return err;
-        }
-    });
-}
-exports.getAll = getAll;
-function getAllLast() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield client.connect();
-            const database = client.db('sensors');
-            const collection = database.collection('brokerData');
-            return yield collection
-                .aggregate([
-                {
-                    $unwind: {
-                        path: '$data',
+class MongoService {
+    constructor() {
+        this.client = new mongodb_1.MongoClient(config_1.MONGODB_URI || '');
+    }
+    connect() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.client.connect();
+                return this.client.db('sensors').collection('brokerData');
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
+    getAll(collection) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield collection.find({}).sort({ $natural: -1 }).toArray();
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
+    getAllLast(collection) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield collection
+                    .aggregate([
+                    {
+                        $unwind: {
+                            path: '$data',
+                        },
                     },
-                },
-                {
-                    $sort: {
-                        'data.LAeq.metadata.TimeInstant.value': -1,
+                    {
+                        $sort: {
+                            'data.LAeq.metadata.TimeInstant.value': -1,
+                        },
                     },
-                },
-                {
-                    $group: {
-                        _id: '$data.id',
-                        doc: { $first: '$$ROOT' },
+                    {
+                        $group: {
+                            _id: '$data.id',
+                            doc: { $first: '$$ROOT' },
+                        },
                     },
-                },
-            ])
-                .toArray();
-        }
-        catch (err) {
-            return err;
-        }
-    });
+                ])
+                    .toArray();
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
+    insertFullData(collection, json) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { acknowledged } = yield collection.insertOne(json);
+                return acknowledged;
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
+    getAllInfoFromId(collection, sensorId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = {
+                data: { $elemMatch: { id: `NoiseLevelObserved-HOPVLCi${sensorId}` } },
+            };
+            try {
+                return yield collection.find(query).toArray();
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
+    getAllSensorIds(collection) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield collection.distinct('data.id');
+            }
+            catch (err) {
+                return err;
+            }
+        });
+    }
 }
-exports.getAllLast = getAllLast;
-function getLastInfo(sensorId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const query = {
-            data: { $elemMatch: { id: `NoiseLevelObserved-HOPVLCi${sensorId}` } },
-        };
-        const options = {
-            sort: { $natural: -1 },
-        };
-        try {
-            yield client.connect();
-            const database = client.db('sensors');
-            const collection = database.collection('brokerData');
-            return yield collection.findOne(query, options);
-        }
-        catch (err) {
-            return err;
-        }
-    });
-}
-exports.getLastInfo = getLastInfo;
-//TODO: afegir projecció als datos que fan falta per al array de la gráfica
-function getAllInfoFromId(sensorId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const query = {
-            data: { $elemMatch: { id: `NoiseLevelObserved-HOPVLCi${sensorId}` } },
-        };
-        try {
-            yield client.connect();
-            const database = client.db('sensors');
-            const collection = database.collection('brokerData');
-            return yield collection.find(query).toArray();
-        }
-        catch (err) {
-            return err;
-        }
-    });
-}
-exports.getAllInfoFromId = getAllInfoFromId;
-function insertFullData(json) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield client.connect();
-            const database = client.db('sensors');
-            const collection = database.collection('brokerData');
-            return yield collection.insertOne(json);
-        }
-        catch (err) {
-            return err;
-        }
-    });
-}
-exports.insertFullData = insertFullData;
+exports.MongoService = MongoService;

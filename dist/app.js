@@ -16,46 +16,66 @@ exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const database_1 = require("./database/database");
-const app = (0, express_1.default)();
+const app = express_1.default();
 exports.app = app;
 app.use(express_1.default.json());
-app.use((0, cors_1.default)());
+app.use(cors_1.default());
+const mongo = new database_1.MongoService();
 app.get('/', (_, res) => {
-    res.json({ routes: { get: ['/', '/getall', 'get/:id'], post: ['/'] } });
+    return res.json({
+        routes: {
+            get: ['/', '/getall', '/getallids', '/getall/last', 'getall/:id'],
+            post: ['/'],
+        },
+    });
 });
 app.get('/getall', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const documents = yield (0, database_1.getAll)();
-    res.send(documents);
+    try {
+        const collection = yield mongo.connect();
+        const documents = yield mongo.getAll(collection);
+        return res.send(documents);
+    }
+    catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+}));
+app.get('/getallids', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const collection = yield mongo.connect();
+        const ids = yield mongo.getAllSensorIds(collection);
+        return res.send(ids);
+    }
+    catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
 }));
 app.get('/getall/last', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const documents = yield (0, database_1.getAllLast)();
-    res.send(documents);
+    try {
+        const collection = yield mongo.connect();
+        const documents = yield mongo.getAllLast(collection);
+        return res.send(documents);
+    }
+    catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
 }));
 app.get('/getall/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const sensorId = req.params.id;
-    const last = yield (0, database_1.getAllInfoFromId)(sensorId);
-    res.send(last);
-}));
-app.get('/get/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const sensorId = req.params.id;
-    const info = yield (0, database_1.getLastInfo)(sensorId);
-    res.send(info);
+    var _a;
+    const collection = yield mongo.connect();
+    const sensorId = (_a = req.params) === null || _a === void 0 ? void 0 : _a.id;
+    const last = yield mongo.getAllInfoFromId(collection, sensorId);
+    return res.send(last);
 }));
 app.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const [data] = req.body.data;
-        console.log(data.id);
-        if (data.id) {
-            req.body.myId = data.id;
-        }
-        const insert = yield (0, database_1.insertFullData)(req.body);
-        res.send(insert);
+        const collection = yield mongo.connect();
+        const insert = yield mongo.insertFullData(collection, req.body);
+        return res.send(insert);
     }
     catch (err) {
-        res.json({
-            error: {
-                message: err.message,
-            },
-        });
+        return res.status(500).json({ error: err.message });
     }
 }));
+app.get('*', (_, res) => {
+    return res.status(301).send('Route not Found');
+});
