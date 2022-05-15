@@ -62,7 +62,27 @@ export class MongoService {
       data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
     };
     try {
-      return await collection.find(query).toArray();
+      return await collection
+        .find(query)
+        .project({
+          _id: 0,
+          subscriptionId: 0,
+          data: {
+            type: 0,
+            LA99: 0,
+            LAMax: 0,
+            LAMin: 0,
+            LA1: 0,
+            LA50: 0,
+            LA10: 0,
+            location: 0,
+            dateObservedFrom: 0,
+            dateObservedTo: 0,
+            operationalStatus: 0,
+            noiseLevelLAEq: 0,
+          },
+        })
+        .toArray();
     } catch (err: unknown) {
       return err;
     }
