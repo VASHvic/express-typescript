@@ -14,7 +14,7 @@ const mongodb_1 = require("mongodb");
 const config_1 = require("../config");
 class MongoService {
     constructor() {
-        this.client = new mongodb_1.MongoClient(config_1.MONGODB_URI || '');
+        this.client = new mongodb_1.MongoClient(config_1.MONGODB_URI);
     }
     connect() {
         return __awaiter(this, void 0, void 0, function* () {

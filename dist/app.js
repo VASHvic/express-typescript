@@ -67,13 +67,18 @@ app.get('/getall/:id', (req, res) => __awaiter(void 0, void 0, void 0, function*
     return res.send(last);
 }));
 app.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const collection = yield mongo.connect();
-        const insert = yield mongo.insertFullData(collection, req.body);
-        return res.send(insert);
+    if (Math.round(Math.random())) {
+        try {
+            const collection = yield mongo.connect();
+            const insert = yield mongo.insertFullData(collection, req.body);
+            return res.send(insert);
+        }
+        catch (err) {
+            return res.status(500).json({ error: err.message });
+        }
     }
-    catch (err) {
-        return res.status(500).json({ error: err.message });
+    else {
+        return res.send('Data was not inserted');
     }
 }));
 app.get('*', (_, res) => {
