@@ -2,7 +2,7 @@ import {Collection, MongoClient} from 'mongodb';
 import {MONGODB_URI} from '../config';
 
 export class MongoService {
-  client = new MongoClient(MONGODB_URI || '');
+  client = new MongoClient(MONGODB_URI);
 
   async connect() {
     try {
