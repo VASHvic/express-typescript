@@ -59,17 +59,17 @@ app.get(
 app.post(
   '/',
   async (req: Request, res: Response): Promise<Response<boolean | Error | String>> => {
-    if (Math.round(Math.random())) {
-      try {
-        const collection = await mongo.connect();
-        const insert = await mongo.insertFullData(collection, req.body);
-        return res.send(insert);
-      } catch (err) {
-        return res.status(500).json({error: err.message});
-      }
-    } else {
-      return res.send('Data was not inserted');
+    // if (Math.round(Math.random())) {
+    try {
+      const collection = await mongo.connect();
+      const insert = await mongo.insertFullData(collection, req.body);
+      return res.send(insert);
+    } catch (err) {
+      return res.status(500).json({error: err.message});
     }
+    // } else {
+    //   return res.send('Data was not inserted');
+    // }
   }
 );
 
