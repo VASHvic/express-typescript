@@ -37,7 +37,8 @@ export class MongoService {
           {
             $group: {
               _id: '$data.id',
-              doc: {$first: '$$ROOT'},
+              LAeq: {$first: '$data.LAeq'},
+              address: {$first: '$data.address'},
             },
           },
         ])
