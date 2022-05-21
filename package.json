@@ -1,16 +1,16 @@
 {
   "name": "sensors-express-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "API with Valencia sound sensor information",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
-    "run": "tsc && node ./dist/index.js",
-    "build": "tsc"
+    "run": "tsc && node ./dist/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Víctor Guillem",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "4.17.13",
