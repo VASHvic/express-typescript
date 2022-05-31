@@ -73,15 +73,21 @@ app.post(
       return res.send(insert);
     } catch (err) {
       return res.status(500).json({error: err.message});
-    }});
+    }
+  }
+);
 
 app.get(
   '/getone/:id',
   async (req: Request, res: Response): Promise<Response<JSON[] | Error>> => {
-    const collection = await mongo.connect();
-    const sensorId = req.params?.id;
-    const last = await mongo.getLastOne(collection, sensorId);
-    return res.send(last);
+    try {
+      const collection = await mongo.connect();
+      const sensorId = req.params?.id;
+      const last = await mongo.getLastOne(collection, sensorId);
+      return res.send(last);
+    } catch (err) {
+      return res.status(500).json({error: err.message});
+    }
   }
 );
 
