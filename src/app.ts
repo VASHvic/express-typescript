@@ -59,7 +59,6 @@ app.get(
 app.post(
   '/',
   async (req: Request, res: Response): Promise<Response<boolean | Error | String>> => {
-    // if (Math.round(Math.random())) {
     try {
       const collection = await mongo.connect();
       const insert = await mongo.insertFullData(collection, req.body);
@@ -67,9 +66,6 @@ app.post(
     } catch (err) {
       return res.status(500).json({error: err.message});
     }
-    // } else {
-    //   return res.send('Data was not inserted');
-    // }
   }
 );
 

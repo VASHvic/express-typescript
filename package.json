@@ -1,7 +1,7 @@
 {
   "name": "sensors-express-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "API REST realitzada com a projecte final per a segón de D.A.W en el I.E.S María Enríquez de Gandía",
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
@@ -9,8 +9,11 @@
     "run": "tsc && node ./dist/index.js",
     "build": "tsc"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "API",
+    "sensors-soroll"
+  ],
+  "author": "Víctor Guillem Lloret",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "4.17.13",
