@@ -81,6 +81,8 @@ app.get(
 app.post('/', async (req: Request, res: Response): Promise<Response<boolean | Error>> => {
   try {
     const collection = await mongo.connect('sensors', 'brokerData');
+    req.body.myCreatedAt = new Date(Date.now());
+    req.body.mySensorId = req.body?.data[0]?.id;
     const insert = await mongo.insertFullData(collection, req.body);
     return res.send(insert);
   } catch (err) {
