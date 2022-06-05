@@ -27,7 +27,7 @@ app.get('/', (_, res: Response): Response<JSON> => {
 
 app.get('/getall', async (_, res: Response): Promise<Response<JSON[] | Error>> => {
   try {
-    const collection = await mongo.connect();
+    const collection = await mongo.connect('sensors', 'brokerData');
     const documents = await mongo.getAll(collection);
     return res.send(documents);
   } catch (err) {
@@ -36,7 +36,7 @@ app.get('/getall', async (_, res: Response): Promise<Response<JSON[] | Error>> =
 });
 app.get('/getallids', async (_, res: Response): Promise<Response<String[] | Error>> => {
   try {
-    const collection = await mongo.connect();
+    const collection = await mongo.connect('sensors', 'brokerData');
     const ids = await mongo.getAllSensorIds(collection);
     return res.send(ids);
   } catch (err) {
@@ -46,7 +46,7 @@ app.get('/getallids', async (_, res: Response): Promise<Response<String[] | Erro
 
 app.get('/getall/last', async (_, res: Response): Promise<Response<JSON[] | Error>> => {
   try {
-    const collection = await mongo.connect();
+    const collection = await mongo.connect('sensors', 'brokerData');
     const documents = await mongo.getAllLast(collection);
     return res.send(documents);
   } catch (err) {
@@ -57,23 +57,10 @@ app.get('/getall/last', async (_, res: Response): Promise<Response<JSON[] | Erro
 app.get(
   '/getall/:id',
   async (req: Request, res: Response): Promise<Response<JSON[] | Error>> => {
-    const collection = await mongo.connect();
+    const collection = await mongo.connect('sensors', 'brokerData');
     const sensorId = req.params?.id;
     const last = await mongo.getAllInfoFromId(collection, sensorId);
     return res.send(last);
-  }
-);
-
-app.post(
-  '/',
-  async (req: Request, res: Response): Promise<Response<boolean | Error | String>> => {
-    try {
-      const collection = await mongo.connect();
-      const insert = await mongo.insertFullData(collection, req.body);
-      return res.send(insert);
-    } catch (err) {
-      return res.status(500).json({error: err.message});
-    }
   }
 );
 
@@ -81,7 +68,7 @@ app.get(
   '/getone/:id',
   async (req: Request, res: Response): Promise<Response<JSON[] | Error>> => {
     try {
-      const collection = await mongo.connect();
+      const collection = await mongo.connect('sensors', 'brokerData');
       const sensorId = req.params?.id;
       const last = await mongo.getLastOne(collection, sensorId);
       return res.send(last);
@@ -93,7 +80,7 @@ app.get(
 
 app.post('/', async (req: Request, res: Response): Promise<Response<boolean | Error>> => {
   try {
-    const collection = await mongo.connect();
+    const collection = await mongo.connect('sensors', 'brokerData');
     const insert = await mongo.insertFullData(collection, req.body);
     return res.send(insert);
   } catch (err) {

@@ -4,10 +4,10 @@ import {MONGODB_URI} from '../config';
 export class MongoService {
   client = new MongoClient(MONGODB_URI);
 
-  async connect(): Promise<Collection> {
+  async connect(myDbName: string, myCollectionName: string): Promise<Collection> {
     try {
       await this.client.connect();
-      return this.client.db('sensors').collection('brokerData');
+      return this.client.db(myDbName).collection(myCollectionName);
     } catch (err) {
       return err;
     }
@@ -52,7 +52,6 @@ export class MongoService {
     collection: Collection,
     sensorId: string
   ): Promise<Document[] | Error> {
-    console.log(sensorId);
     try {
       return await collection
         .find({data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}}})
@@ -115,6 +114,8 @@ export class MongoService {
             dateObservedTo: 0,
             operationalStatus: 0,
             noiseLevelLAEq: 0,
+            LA90: 0,
+            name: 0,
           },
         })
         .toArray();
