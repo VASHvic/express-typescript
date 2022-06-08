@@ -54,10 +54,12 @@ export class MongoService {
   ): Promise<Document[] | Error> {
     try {
       return await collection
-        .find({data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}}})
+        .find({mySensorId: `NoiseLevelObserved-HOPVLCi${sensorId}`})
         .project({
           _id: 0,
           subscriptionId: 0,
+          myCreatedAt: 0,
+          mySensorId: 0,
           data: {
             type: 0,
             LA99: 0,
@@ -93,7 +95,8 @@ export class MongoService {
     sensorId: string
   ): Promise<Document[] | Error> {
     const query = {
-      data: {$elemMatch: {id: `NoiseLevelObserved-HOPVLCi${sensorId}`}},
+      mySensorId: `NoiseLevelObserved-HOPVLCi${sensorId}`,
+      myCreatedAt: {$gt: new Date(Date.now() - 24 * 60 * 60 * 1000)},
     };
     try {
       return await collection
@@ -101,6 +104,8 @@ export class MongoService {
         .project({
           _id: 0,
           subscriptionId: 0,
+          myCreatedAt: 0,
+          mySensorId: 0,
           data: {
             type: 0,
             LA99: 0,

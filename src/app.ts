@@ -57,10 +57,14 @@ app.get('/getall/last', async (_, res: Response): Promise<Response<JSON[] | Erro
 app.get(
   '/getall/:id',
   async (req: Request, res: Response): Promise<Response<JSON[] | Error>> => {
-    const collection = await mongo.connect('sensors', 'brokerData');
-    const sensorId = req.params?.id;
-    const last = await mongo.getAllInfoFromId(collection, sensorId);
-    return res.send(last);
+    try {
+      const collection = await mongo.connect('sensors', 'brokerData');
+      const sensorId = req.params?.id;
+      const last = await mongo.getAllInfoFromId(collection, sensorId);
+      return res.send(last);
+    } catch (err) {
+      return res.status(500).json({error: err.message});
+    }
   }
 );
 
